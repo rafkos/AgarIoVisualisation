@@ -1,0 +1,7 @@
+{
+	host: "localhost",
+	port: 8000,
+	userName: "kfazi3",
+	password: "tajne",
+	isVisualization: "true"
+}
