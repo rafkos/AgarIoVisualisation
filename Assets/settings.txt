@@ -1,7 +1,7 @@
 {
 	host: "localhost",
 	port: 8000,
-	userName: "kfazi3",
+	userName: "BARDZO D£UGA I G£UPIA NAZWA",
 	password: "tajne",
 	isVisualization: "true"
 }
