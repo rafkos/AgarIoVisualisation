@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using AgarIo.Contract;
 using Assets.Scripts.Events.Game;
+using Assets.Scripts.Game.Camera;
+using Assets.Scripts.Game.Players;
 using Assets.Scripts.ServerConnection;
 using Assets.Scripts.Services;
 using Assets.Scripts.UI;

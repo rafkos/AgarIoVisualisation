@@ -3,7 +3,7 @@ using AgarIo.Contract;
 using Assets.Scripts.UI;
 using UnityEngine;
 
-namespace Assets.Scripts.Game
+namespace Assets.Scripts.Game.Players
 {
     public class Player : MonoBehaviour, IMonoBehaviour
     {
@@ -11,8 +11,8 @@ namespace Assets.Scripts.Game
         public Renderer InnerCircleRenderer;
         public TextMesh TextMesh;
         public BlobPositioning BlobPositioning;
-        public float TextLengthCharacterSizeRatio = -36.0f;
-        public float TextLengthCharacterSizeOffset = 17.5f;
+        public float TextLengthCharacterSizeExponentFactor = 0.58f;
+        public float TextLengthCharacterSizeTextLengthFactor = -0.128f;
         public float ScaleChangeSpeed = 2.0f;
         public float PositionChangeSpeed = 2.0f;
 
@@ -74,7 +74,7 @@ namespace Assets.Scripts.Game
                 return;
             }
 
-            TextMesh.characterSize = playerName.ToCharArray().Length * TextLengthCharacterSizeRatio + TextLengthCharacterSizeOffset;
+            TextMesh.characterSize = (float)(TextLengthCharacterSizeExponentFactor * Math.Exp(playerName.Length * TextLengthCharacterSizeTextLengthFactor));
             TextMesh.text = playerName;
         }
 

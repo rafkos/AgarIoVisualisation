@@ -1,7 +1,7 @@
-{
+Ôªø{
 	host: "localhost",
 	port: 8000,
-	userName: "BARDZO D£UGA I G£UPIA NAZWA",
+	userName: "BARDZO D≈ÅUGA I G≈ÅUPIA NAZWA",
 	password: "tajne",
 	isVisualization: "true"
 }

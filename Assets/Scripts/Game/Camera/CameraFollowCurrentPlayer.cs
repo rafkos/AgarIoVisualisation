@@ -1,18 +1,18 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Assets.Scripts.Game.Players;
 using Assets.Scripts.UI;
 using UnityEngine;
 
-namespace Assets.Scripts.Game
+namespace Assets.Scripts.Game.Camera
 {
     public class CameraFollowCurrentPlayer : MonoBehaviour, IMonoBehaviour
     {
         private Vector3 _velocity = Vector3.zero;
         public float ZoomSpeed = 2.0f;
-        public float ZoomFactor = 0.25f;
-        public float InitialFieldOfView = 5.0f;
+        public float ZoomFactor = 20f;
+        public float MultipleBlobsFactor = 0.375f;
         public float DampTime = 0.15f;
 
         public IEnumerable<Player> PlayerBlobs { get; set; }
@@ -36,39 +36,58 @@ namespace Assets.Scripts.Game
                 return;
             }
 
+            var adjustedZoomFactor = PlayerBlobs.Count() == 1 ? ZoomFactor : ZoomFactor * MultipleBlobsFactor;
             var blobsPositions = PlayerBlobs.Select(p => p.transform).ToList();
-            var blobBounds = GetVectorsBounds(blobsPositions);
-            
-            var cameraComponent = GetComponent<Camera>();
+            var blobSizes = PlayerBlobs.Select(p => p.BorderRenderer.bounds).ToList();
+            var blobBounds = GetVectorsBounds(blobsPositions, blobSizes);
+
+            var cameraComponent = GetComponent<UnityEngine.Camera>();
             var point = cameraComponent.WorldToViewportPoint(blobBounds.center);
             var delta = blobBounds.center - cameraComponent.ViewportToWorldPoint(new Vector3(0.5f, 0.5f, point.z));
             var destination = transform.position + delta;
-            var newFieldOfView = InitialFieldOfView * (Math.Abs(blobBounds.max.x - blobBounds.min.x) * ZoomFactor);
+            var newFieldOfView = adjustedZoomFactor * (Math.Max(blobBounds.size.x, blobBounds.size.y));
 
             transform.position = Vector3.SmoothDamp(transform.position, destination, ref _velocity, DampTime);
             cameraComponent.fieldOfView = Mathf.Lerp(cameraComponent.fieldOfView, newFieldOfView, ZoomSpeed * Time.deltaTime);
         }
 
-        public static Bounds GetVectorsBounds(IList<Transform> transforms)
+        public static Bounds GetVectorsBounds(IList<Transform> transforms, IList<Bounds> blobBounds)
         {
-            if (!transforms.Any())
+            if (transforms.Count != blobBounds.Count)
+            {
+                throw new ArgumentException("transforms and blobBounds must be of same length.");
+            }
+
+            var positionsAndSizes = transforms.Select((t, i) => new PositionAndSizeTuple
+            {
+                Position = t.position,
+                Size = blobBounds[i].size
+            }).ToList();
+
+            if (!positionsAndSizes.Any())
             {
                 return new Bounds(Vector3.zero, Vector3.zero);
             }
 
-            if (transforms.Count == 1)
+            if (positionsAndSizes.Count == 1)
             {
-                return new Bounds(transforms.First().position, transforms.First().localScale);
+                return new Bounds(positionsAndSizes.First().Position, positionsAndSizes.First().Size);
             }
 
-            var bounds = new Bounds(transforms.First().position, transforms.First().localScale);
+            var bounds = new Bounds(positionsAndSizes.First().Position, positionsAndSizes.First().Size);
 
-            foreach (var transform in transforms.Skip(1))
+            foreach (var positionAndSize in positionsAndSizes.Skip(1))
             {
-                bounds.Encapsulate(new Bounds(transform.localPosition, transform.localScale));
+                bounds.Encapsulate(new Bounds(positionAndSize.Position, positionAndSize.Size));
             }
 
             return bounds;
         }
+    }
+
+    public class PositionAndSizeTuple
+    {
+        public Vector3 Position;
+        public Vector3 Size;
     }
 }
