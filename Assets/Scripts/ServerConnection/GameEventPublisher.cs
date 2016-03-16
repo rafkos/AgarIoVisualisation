@@ -40,7 +40,7 @@ namespace Assets.Scripts.ServerConnection
 
         private void PublishScoreUpdatedEvent(IEnumerable<PlayerStatDto> playerStats)
         {
-            var playerScores = playerStats.Select(i => new PlayerScore { PlayerName = i.Name, PlayerColor = Color.green, Score = i.Score });
+            var playerScores = playerStats.Select(i => new PlayerScore { PlayerName = i.Name, Score = i.Score });
 
             _executeOnMainThread.Enqueue(() => _eventAggregator.Publish(new PlayerScoreUpdatedEvent(playerScores)));
         }

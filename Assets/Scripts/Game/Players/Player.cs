@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using AgarIo.Contract;
 using Assets.Scripts.UI;
 using UnityEngine;
@@ -11,8 +12,9 @@ namespace Assets.Scripts.Game.Players
         public Renderer InnerCircleRenderer;
         public TextMesh TextMesh;
         public BlobPositioning BlobPositioning;
-        public float TextLengthCharacterSizeExponentFactor = 0.58f;
-        public float TextLengthCharacterSizeTextLengthFactor = -0.128f;
+        public float TextScaleA = 0.0058f;
+        public float TextScaleB = -0.1183f;
+        public float TextScaleC = 0.7508f;
         public float ScaleChangeSpeed = 2.0f;
         public float PositionChangeSpeed = 2.0f;
 
@@ -69,12 +71,13 @@ namespace Assets.Scripts.Game.Players
             _worldSize = worldSize;
 
             var playerName = PlayerBlobDto.Name;
+            playerName = playerName.Substring(0, Math.Min(playerName.Length, 10));
             if (TextMesh.text == playerName)
             {
                 return;
             }
 
-            TextMesh.characterSize = (float)(TextLengthCharacterSizeExponentFactor * Math.Exp(playerName.Length * TextLengthCharacterSizeTextLengthFactor));
+            TextMesh.characterSize = TextScaleA * (float)Math.Pow(playerName.Length, 2) + TextScaleB * playerName.Length + TextScaleC;
             TextMesh.text = playerName;
         }
 

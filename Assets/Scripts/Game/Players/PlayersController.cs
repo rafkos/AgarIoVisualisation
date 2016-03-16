@@ -20,14 +20,17 @@ namespace Assets.Scripts.Game
         private SubscriptionToken _playersEventSubscriptionToken;
 
         public Player PlayerPrefab;
-        public List<Color> FoodColors;
+        public List<Color> PlayerColors;
         private CameraFollowCurrentPlayer _cameraFollow;
         private GameSettings _gameSettings;
+
+        private readonly Dictionary<string, Color> _usedPlayerColorsByPlayerName;
 
         public PlayersController()
         {
             _playersObjects = new Dictionary<int, Player>();
             _playersUpdateQueue = new Queue<BlobToUpdate>();
+            _usedPlayerColorsByPlayerName = new Dictionary<string, Color>();
         }
 
         public void Awake()
@@ -75,13 +78,16 @@ namespace Assets.Scripts.Game
                     }
                 }
 
-                if (!updateCamera && _cameraFollow != null)
+                if (!updateCamera)
                 {
                     return;
                 }
 
                 var playerObjects = _playersObjects.Values.Where(b => b.PlayerBlobDto.Name == _gameSettings.UserName);
-                _cameraFollow.PlayerBlobs = playerObjects;
+                if (_cameraFollow != null)
+                {
+                    _cameraFollow.PlayerBlobs = playerObjects;
+                }
             }
         }
 
@@ -115,7 +121,21 @@ namespace Assets.Scripts.Game
 
             float h, s, v;
 
-            var playerColor = Color.green;
+            Color playerColor;
+
+            if (_usedPlayerColorsByPlayerName.ContainsKey(player.Name))
+            {
+                playerColor = _usedPlayerColorsByPlayerName[player.Name];
+            }
+            else
+            {
+                playerColor = PlayerColors.Count > _usedPlayerColorsByPlayerName.Count
+                                  ? PlayerColors.First(p => !_usedPlayerColorsByPlayerName.ContainsValue(p))
+                                  : PlayerColors.ElementAt(player.Id % PlayerColors.Count);
+                _usedPlayerColorsByPlayerName.Add(player.Name, playerColor);
+                _eventAggregator.Publish(new PlayerColorAssignedEvent(player.Name, playerColor));
+            }
+
             Color.RGBToHSV(playerColor, out h, out s, out v);
             var innerCircleColor = Color.HSVToRGB(h * 0.9f, s, v);
             var borderColor = Color.HSVToRGB(h, s, v);

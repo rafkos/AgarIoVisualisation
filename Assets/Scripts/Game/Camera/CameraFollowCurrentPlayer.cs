@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Assets.Scripts.Game.Players;
+using Assets.Scripts.ServerConnection;
+using Assets.Scripts.Services;
 using Assets.Scripts.UI;
 using UnityEngine;
 
@@ -14,11 +16,13 @@ namespace Assets.Scripts.Game.Camera
         public float ZoomFactor = 20f;
         public float MultipleBlobsFactor = 0.375f;
         public float DampTime = 0.15f;
+        private GameSettings _gameSettings;
 
         public IEnumerable<Player> PlayerBlobs { get; set; }
 
         public void Awake()
         {
+            _gameSettings = DependencyResolver.Current.GetService<GameSettings>();
         }
 
         public void Start()
@@ -31,7 +35,7 @@ namespace Assets.Scripts.Game.Camera
 
         public void Update()
         {
-            if (PlayerBlobs == null || !PlayerBlobs.Any())
+            if (PlayerBlobs == null || !PlayerBlobs.Any() || _gameSettings.IsFlyCameraEnabled)
             {
                 return;
             }

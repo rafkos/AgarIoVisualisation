@@ -1,7 +1,8 @@
 ﻿{
 	host: "localhost",
 	port: 8000,
-	userName: "BARDZO DŁUGA I GŁUPIA NAZWA",
+	userName: "AB",
 	password: "tajne",
-	isVisualization: "true"
+	isVisualization: "true",
+	isFlyCameraEnabled: "true"
 }

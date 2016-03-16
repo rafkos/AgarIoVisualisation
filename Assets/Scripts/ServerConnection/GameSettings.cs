@@ -13,5 +13,7 @@ namespace Assets.Scripts.ServerConnection
         public bool IsAdmin { get; set; }
 
         public bool IsVisualization { get; set; }
+
+        public bool IsFlyCameraEnabled { get; set; }
     }
 }
